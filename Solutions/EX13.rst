@@ -1,0 +1,74 @@
+EX 13
+===============
+Description
+------------------
+We need to create a method String plusOut(String str, String word).
+The method will replace all characters in given string **str** with **"+"** sign, except for occurrences of string **word**.
+The solution must be recursive (contain  internal calls for the same method, not use cycles).
+
+Methods
+------------------
+* str.startsWith(String **word**)
+
+Checks if the given string contains string **word** at the very beginning. 
+
+.. code-block:: console
+
+	Examples:
+	1. "abc".startsWith("ab") => true
+	2. "abc".startsWith("abcdefg") => false
+	3. "abc". startsWith("bc") => false
+
+* str.substring(int **startindex**)
+
+| Returns substring of the given string, which does not contain first **startindex** symbols.
+| **Throws IndexOutOfBoundsException if the index is not in range of string.**
+
+.. code-block:: console
+
+	Examples:
+	1. "We are number one!".substring(1) => "e are number one!"
+        1. "A".substring(1) => ""
+	2. "We are number one!".substring(0) => "We are number one!"
+	3. "A".substring(2) => IndexOutOfBoundsException
+
+* str.length()
+
+Returns string length.
+
+.. code-block:: console
+
+	Examples:
+	1."Hey".length() => 3
+	2. "".length() => 0
+
+Logic
+--------
+
+| Solution logic:
+| 0.1 Every step of conversion returns results of its own step and the next steps.
+| 0.2 The result of the next steps is calculated by calling the method with different string of the text to be converted.
+|     In our case, we will skip characters of given string using str.substring(index) method.
+| 0.3 The method will end if there are no more symbols to convert.
+| 1. If our source string is empty, return empty string (because there are no characters to convert).
+| 2. If our source string starts with the given word, return the word unchanged and continue conversion of the source string skipping 
+|    its first word.length() symbols.
+| 3. If none of previous points are true, replace the first symbol with "+" and continue conversion starting from the next symbol.
+
+
+Solution
+--------
+
+.. code-block:: console
+
+ public class EX13 {
+    public static String plusOut(String str, String word) {
+        if (str.length() == 0) { // Always define end condition at the very beginning!
+            return "";
+        }
+        if (str.startsWith(word)) { 
+            return word + plusOut(str.substring(word.length()), word);
+        }
+        return "+" + plusOut(str.substring(1), word);
+    }
+ }
