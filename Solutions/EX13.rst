@@ -48,11 +48,10 @@ Logic
 | Solution logic:
 | 0.1 Every step of conversion returns results of its own step and the next steps.
 | 0.2 The result of the next steps is calculated by calling the method with different string of the text to be converted.
-|     In our case, we will skip characters of given string using str.substring(index) method.
+In our case, we will skip characters of given string using str.substring(index) method.
 | 0.3 The method will end if there are no more symbols to convert.
 | 1. If our source string is empty, return empty string (because there are no characters to convert).
-| 2. If our source string starts with the given word, return the word unchanged and continue conversion of the source string skipping 
-|    its first word.length() symbols.
+| 2. If our source string starts with the given word, return the word unchanged and continue conversion of the source string skipping its first word.length() symbols.
 | 3. If none of previous points are true, replace the first symbol with "+" and continue conversion starting from the next symbol.
 
 
