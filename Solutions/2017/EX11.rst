@@ -1,0 +1,126 @@
+EX11
+====
+
+The solution of this task, we'll start with the method ``public static int maxElement(List<Integer> nums, int max)``.
+A little later I will explain why this is so (we want to apply a cheat :))
+
+The essense of the task is very simple, we have a row of numbers, from which we must find the maximum with a help of recursion.
+
+Let's look at an example
+
+.. code:: java
+
+ maxElement(List.of(1, 2, 3), 0) => 3
+ maxElement(List.of(3, 2, 1), 0) => 3
+ maxElement(List.of(6), 0) => 6
+ maxElement(List.of(-6), 0) => 0
+ maxElement(List.of(-6), -100) => -6
+
+To solve this task, we need to use an auxilary variable, which in fact is only plus.
+
+Immediately I would like to start the reasoning with the method ``nums.subList (1, nums.size ())``
+
+This method (in this form in which I wrote it) allows you to return a list with elements from the first to the last.
+
+The key point in using such a method is that all calculations and actions that we do, we should do from right to left.
+
+why so?
+
+We can analyze the last element of the list at each step of recursion and as a result of analyze, take some actions, then
+reduce the size of the list omitting the last value, and saving the maximum value in the auxilary variable. 
+
+The phrase "as a result of analyze, take some actions" may not be very clear at the first sight, therefore
+
+Let's look at the details.
+
+Let's imagine that we pass a list with values 1,2,3,2,1 and pass an auxiliary variable with the initial value 1.
+
+.. code:: java
+    
+    if (nums.get(nums.size() - 1) > max) {
+            return maxElement(nums.subList(0, nums.size() - 1), 2);
+        } else {
+            return maxElement(nums.subList(0, nums.size() - 1), 1);
+        }
+
+At the beginning we take a value from the last element of list and see, if it's value is more than our auxiliary variable or not.
+As we can see, no (1 == 1) therefore, we go to the part of else, where we call the same method to which we will pass the list ommting
+the last element and in the auxiliary variable we will pass 1.
+
+Let's repeat the same actions, now with list 1,2,3,2
+
+We take the last element (2), (2 > 1) (our variable) and therefore let's call again maxElement and pass a list omitting the last element.
+BUT, as the maximum element,this time, we will pass 2.
+This example shows only the first 2 steps of the recursion. in example in the part with auxiliary variables there are constants 2 and 1, you will need
+to replace them.
+
+As a result, on the last step of recursion, when you get to the last element of the list, you will have it and the maximum value.
+In the method, you must create a new condition, which at the last step of the recursion should to return the maximum value.
+
+Now let's talk about why we started this task with this method.
+The answer is very simple, we use this method to solve the method ``public static int maxElement(List<Integer> nums)``
+Namely, we can put in the body of this method, the method that we did before.
+
+Now let's talk about the method ``public static int maxGrowth (List <Integer> nums)``
+
+The essence of this method is that it must return the maximum number of digits that go in ascending order (Pikim järjestikune kasvav alamjada)
+
+Let's look at an example for clarity
+
+.. code:: java
+
+ maxGrowth(List.of(1, 2, 3)) => 3 
+ maxGrowth(List.of(3, 2, 1)) => 1 
+ maxGrowth(List.of(1, 2, 3, 1, 2, 3, 4)) => 4 
+ maxGrowth(List.of(1, 2, 3, 3, 1, 5, 6, 8)) => 4 
+
+
+The solution of this task is similar to the solution of the first one (we must use an auxiliary method that would have a auxiliary variable or
+variables.
+
+As I mentioned earlier, the most correct decision is to go from right to left. I suggest using the following logic in this task.
+
+1) We will compare the last two numbers
+2) We will use an auxiliary variable that would count how many times in a row the number increases.
+3) As we go from right to left, it will be more correct to count how many times in a row the number decreases.
+
+
+Let's look at a couple of simple examples.
+
+Imagine that our numbers are 3, 5.
+
+.. code:: java
+
+    int sequence = 1; //variable that stores, how many times the number increased in a row.
+    if (nums.get(nums.size() - 2) < nums.get(nums.size() - 1)) { // compare two last numbers (3 < 5)
+    sequence++; // increase the sequence since 3 is indeed less than 5
+    return sequence;
+    }
+
+This example hasn't involved recursion. Let's consider now an example with recursion. As a list we use (1,10,100,1000)
+
+.. code:: java
+
+    public static void main(String[] args) {
+        int sequence = 1;
+        System.out.println(someMethod(List.of(1, 10, 100, 1000), sequence));
+    }
+
+ public static int someMethod(List<Integer> nums, int serial) {
+     if (nums.get(nums.size() - 2) < nums.get(nums.size() - 1)) {
+         sequence++;
+         return someMethod(nums.subList(0, nums.size() - 1), sequence);
+     }
+
+ 
+During each recursion, our variable sequence will be incremented, however this method does not take into acсount situation when
+there is only one element in the list, so this code will not work. Try adding to the body of the method someMethod condition that
+takes into account the situation, when the last element in the list remain, which will help to avoid the mistake.
+ 
+Also, your method should take into account the situation when the series is broken (interrupted) for example if the list consist of
+(1,2,3,1,2,3,4) then first 4 numbers decrases after which, the series is interrupted and then the serial variable must be reset (make
+it again 1). Same remember that we need to find the maximum number of decrases! if we continue to look at the example with (1,2,3,1,2,3,4),
+first the series is 4, then counter is reset, and then series is 3, as result we will get value 3, however has to be 4.
+Therefore, it would be prudent to use another variable that would store the maximum number of decreases.
+
+That's all, good luck! :)
