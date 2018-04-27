@@ -48,7 +48,7 @@ the first element and as the auxiliary variable we will pass 1.
 Let's repeat the same actions, now with list 2,3,2,1
 
 We take the first element (2), and compare with max (auxiliary variable) (2 > 1). Now we call maxElement method in the if part where we pass a list omitting the first element.
-BUT, as the maximum element,this time, we will pass 2.
+BUT, as the maximum element, this time, we will pass 2.
 This example shows only the first 2 steps of the recursion. in example in the part with auxiliary variables there are constants 2 and 1, you will need
 to replace them.
 
