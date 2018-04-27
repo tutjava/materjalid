@@ -31,6 +31,8 @@ Let's look at the details.
 
 Let's imagine that we pass a list with values 1,2,3,2,1 and pass an auxiliary variable with the initial value 1.
 
+The basic idea is to pass the maximum value at each step of the recursion
+
 .. code:: java
     
     if (nums.get(0) > max) {
@@ -112,9 +114,9 @@ there is only one element in the list, so this code will not work. Try adding to
 takes into account the situation, when the last element in the list remain, which will help to avoid the mistake.
  
 Also, your method should take into account the situation when the series is broken (interrupted) for example if the list consist of
-(1,2,3,4,1,2,3) then first 3 numbers increases after which, the series is interrupted and then the serial variable must be reset (make
+(1,2,3,4,1,2,3) then first 4 numbers increases after which, the series is interrupted and then the serial variable must be reset (make
 it again 1). Same remember that we need to find the maximum number of increases! if we continue to look at the example with (1,2,3,4,1,2,3),
-first the series is 4, then counter is reset, and then series is 3, as result we will get value 3, however has to be 4.
+first the series is 4, then counter is reset, and then series is 3, as result in the end we will get value 3, however it has to be 4.
 Therefore, it would be prudent to use one more additional variable that would store the maximum number of decreases.
 
 That's all, good luck! :)
