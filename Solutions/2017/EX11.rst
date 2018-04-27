@@ -22,12 +22,8 @@ Immediately I would like to start the reasoning with the method ``nums.subList (
 
 This method (in this form in which I wrote it) allows you to return a list with elements from the first to the last.
 
-The key point in using such a method is that all calculations and actions that we do, we should do from right to left.
-
-why so?
-
-We can analyze the last element of the list at each step of recursion and as a result of analyze, take some actions, then
-reduce the size of the list omitting the last value, and saving the maximum value in the auxilary variable. 
+The key point in using such a method is that We can analyze the first element of the list at each step of recursion and as a result of analyze, take some actions, then
+reduce the size of the list omitting the first value, and saving the maximum value in the auxilary variable. 
 
 The phrase "as a result of analyze, take some actions" may not be very clear at the first sight, therefore
 
@@ -37,19 +33,19 @@ Let's imagine that we pass a list with values 1,2,3,2,1 and pass an auxiliary va
 
 .. code:: java
     
-    if (nums.get(nums.size() - 1) > max) {
-            return maxElement(nums.subList(0, nums.size() - 1), 2);
+    if (nums.get(0) > max) {
+            return maxElement(nums.subList(1, nums.size()), 2);
         } else {
-            return maxElement(nums.subList(0, nums.size() - 1), 1);
+            return maxElement(nums.subList(1, nums.size()), 1);
         }
 
-At the beginning we take a value from the last element of list and see, if it's value is more than our auxiliary variable or not.
+At the beginning we take a value from the first element of a list and see, if it's value is more than our auxiliary variable or not.
 As we can see, no (1 == 1) therefore, we go to the part of else, where we call the same method to which we will pass the list ommting
-the last element and in the auxiliary variable we will pass 1.
+the first element and as the auxiliary variable we will pass 1.
 
-Let's repeat the same actions, now with list 1,2,3,2
+Let's repeat the same actions, now with list 2,3,2,1
 
-We take the last element (2), (2 > 1) (our variable) and therefore let's call again maxElement and pass a list omitting the last element.
+We take the first element (2), and compare with max (auxiliary variable) (2 > 1). Now we call maxElement method in the if part where we pass a list omitting the first element.
 BUT, as the maximum element,this time, we will pass 2.
 This example shows only the first 2 steps of the recursion. in example in the part with auxiliary variables there are constants 2 and 1, you will need
 to replace them.
@@ -78,24 +74,22 @@ Let's look at an example for clarity
 The solution of this task is similar to the solution of the first one (we must use an auxiliary method that would have a auxiliary variable or
 variables.
 
-As I mentioned earlier, the most correct decision is to go from right to left. I suggest using the following logic in this task.
+I suggest using the following logic in this task.
 
-1) We will compare the last two numbers
+1) We will compare the first two numbers
 2) We will use an auxiliary variable that would count how many times in a row the number increases.
-3) As we go from right to left, it will be more correct to count how many times in a row the number decreases.
-
 
 Let's look at a couple of simple examples.
 
-Imagine that our numbers are 3, 5.
+Imagine that in our list we have numbers 3, 5 (List.of(3,5))
 
 .. code:: java
 
     int sequence = 1; //variable that stores, how many times the number increased in a row.
-    if (nums.get(nums.size() - 2) < nums.get(nums.size() - 1)) { // compare two last numbers (3 < 5)
-    sequence++; // increase the sequence since 3 is indeed less than 5
-    return sequence;
+    if (nums.get(0) < nums.get(1) { // compare two last numbers (3 < 5)
+    sequence++; // increase the sequence
     }
+    return sequence;
 
 This example hasn't involved recursion. Let's consider now an example with recursion. As a list we use (1,10,100,1000)
 
@@ -106,21 +100,21 @@ This example hasn't involved recursion. Let's consider now an example with recur
         System.out.println(someMethod(List.of(1, 10, 100, 1000), sequence));
     }
 
- public static int someMethod(List<Integer> nums, int serial) {
-     if (nums.get(nums.size() - 2) < nums.get(nums.size() - 1)) {
+ public static int someMethod(List<Integer> nums, int sequence) {
+     if (nums.get(0) < nums.get(1)) {
          sequence++;
-         return someMethod(nums.subList(0, nums.size() - 1), sequence);
+         return someMethod(nums.subList(1, nums.size()), sequence);
      }
 
  
 During each recursion, our variable sequence will be incremented, however this method does not take into acсount situation when
-there is only one element in the list, so this code will not work. Try adding to the body of the method someMethod condition that
+there is only one element in the list, so this code will not work. Try adding to the body of the ''someMethod'' condition that
 takes into account the situation, when the last element in the list remain, which will help to avoid the mistake.
  
 Also, your method should take into account the situation when the series is broken (interrupted) for example if the list consist of
-(1,2,3,1,2,3,4) then first 4 numbers decrases after which, the series is interrupted and then the serial variable must be reset (make
-it again 1). Same remember that we need to find the maximum number of decrases! if we continue to look at the example with (1,2,3,1,2,3,4),
+(1,2,3,4,1,2,3) then first 3 numbers increases after which, the series is interrupted and then the serial variable must be reset (make
+it again 1). Same remember that we need to find the maximum number of increases! if we continue to look at the example with (1,2,3,4,1,2,3),
 first the series is 4, then counter is reset, and then series is 3, as result we will get value 3, however has to be 4.
-Therefore, it would be prudent to use another variable that would store the maximum number of decreases.
+Therefore, it would be prudent to use one more additional variable that would store the maximum number of decreases.
 
 That's all, good luck! :)
