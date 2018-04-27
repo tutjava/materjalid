@@ -22,7 +22,7 @@ Immediately I would like to start the reasoning with the method ``nums.subList (
 
 This method (in this form in which I wrote it) allows you to return a list with elements from the first to the last.
 
-The key point in using such a method is that We can analyze the first element of the list at each step of recursion and as a result of analyze, take some actions, then
+The key point in using such a method is that we can analyze the first element of the list at each step of recursion and as a result of analyze, take some actions, then
 reduce the size of the list omitting the first value, and saving the maximum value in the auxilary variable. 
 
 The phrase "as a result of analyze, take some actions" may not be very clear at the first sight, therefore
@@ -108,7 +108,7 @@ This example hasn't involved recursion. Let's consider now an example with recur
 
  
 During each recursion, our variable sequence will be incremented, however this method does not take into acсount situation when
-there is only one element in the list, so this code will not work. Try adding to the body of the ''someMethod'' condition that
+there is only one element in the list, so this code will not work. Try adding to the body of the ``someMethod`` condition that
 takes into account the situation, when the last element in the list remain, which will help to avoid the mistake.
  
 Also, your method should take into account the situation when the series is broken (interrupted) for example if the list consist of
