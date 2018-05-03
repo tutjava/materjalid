@@ -1,0 +1,152 @@
+EX07
+====
+
+Eesmärk
+-------
+Selles ülesandes on vaja realiseerida nö pangakaartide andmebaasi, kuhu saab sisestada andmed kaardi ja omaniku kohta,
+kus need andmed on tabeli kujul nähtavad ning kus mõned andmed saab otse tabelis muuta.
+
+Kuidas jagada ülesanne osadeks
+------------------------------
+Kõigepealt mõtleme selle peale, mis komponentidest programm peab üldiselt koosnema. Selleks vaatame, millised on programmi 
+põhiülesanded - tabeli näitamine, andmete sisestamine ja kaartide loomine. Esimest kaks osa on ilmselt kõige rohkem
+seotud kasutajaliidese seadistamisega, kolmas aga otseselt OOP-ga. Mugavuseks jagame koodi kolme pakki + neljas sisaldab endas
+Main klassi programmi käivitamiseks:
+
+- cards
+- containers
+- pages
+- main
+
+Koodi klassid ja meetodid
+-------------------------
+**Cards**
+
+Ülesandes on vaja luua kahest tüüpi kaarti - debit ja credit. Kindlasti nendel kaartidel on mingeid samasuguseid omadusi olemas.
+Seetõttu peale debit ja credit kaartide klasse tuleb luua abstraktne klass, mis kirjeldab mõlemad. 
+Abstraktses klassis on olemas erinevad getterid:
+
+- *getOwnerName()*
+- *getCardNumber()*
+- *getLimit()*
+- *getCardType()*
+
+ja setterid:
+
+- *setOwnerName(String ownerName)*
+- *setLimit(String limit)*
+
+...millega saame infot kaardi objektilt või anname uut.
+Kõige mugavam viis kaardi tüübi hoidmiseks on enum-klassis. Seoses sellega, et meetodid tüübi kontrollimiseks (boolean-id
+isCreditCard() ja isDebitCard() asuvad samas abstract Card klassis, valikule vastavad muutujad peavad jääma privaatseteks.
+
+Seoses sellega, et erinevat tüüpi kaarte luuakse programmi koodi teises osas (seal, kus saame kasutaja poolt sisestatud andmed kätte),
+kõige mugavam oleks vältida samas kohas uue objekti otseset loomist. Seda saab lahendada lisades abstraaksele klassile staatilise
+meetodi, mis tegeleb kaardi loomisega just kaardi klassi sees:
+
+- *public static Card createCard(String ownerName, String cardNumber, CardType cardType)*
+- *public static Card createCard(String ownerName, String cardNumber, CardType cardType, String limit)*
+
+On mõistlik teha kaks varianti sellest meetodist, sest limiidi määramine kaardile on valikuline ja on määratav ainult krediidi kaardile.
+
+**Containers**
+
+Meil on vaja kõik kaardid mingis kohas hoida, et hiljem kuvada neid tabelis. Selleks on olemas klass ClientData, mille abil koostakse
+ja tagastatakse kaartide list. Nüüd on sama olukord, nagu uue kaardi loomisega - me ei taha luua uut objekti selleks ebasobivas
+koodi osas, ja sellel juhul meil polegi vaja kogu aeg nimekirja tagastamiseks uut andmete objekti. List kaartidega pidevalt uuendatakse
+klassi sees staatiliste meetodite abil:
+
+- *public static void add(Card card)*
+- *public static LinkedList<Card> getDataList()*
+
+**Pages**
+
+Programmi saab mahutada ühte akna, aga mugavam tundub ikka jagada seda nö "table-screen" ja "form-screen" osadeks. Kaks klassi, mis
+loovad kaks tabeli - andmete kuvamiseks ja kardi loomise/registreerimise vormi täitmiseks:
+
+- NewCardForm
+- Table
+
+**Table** klass kujutab ennast JavaFX TableView kasutajaliidese kontrollerit. Seal pole vaja palju loogikat kirjutada - ainult nende 
+veergude jaoks, mida peame tegema kasutaja jaoks "editable".
+Klass koosneb meetoditest, millest igaüks koostab ja tagastab veeru.
+
+**NB! Kuidas seadistada TableView**
+
+JavaFX-is on olemas meetod *setEditable()*, et kasutajal oleks võimalik muuta TableView sisu. Enne, kui paneme
+veerud tabeli paika, tuleb anda tabelile andmed töötlemiseks ehk rakendame meetodi *setItems(ObservableList<Card> cards)*. Veerud
+TableView-s hoitakse selle objekti nimekirjas ning nende lisamiseks tuleb kõigepealt kutsuda nimekirja (*getColumns()*) ja lisada
+kõik veerud järjest *varargs* parameetrina meetodiga *addAll()*
+
+Selleks, et saaksime kaartidest koostatud tavaline List ObservableList-iks muuta, võib teha eraldi meetod, kus luuakse ObservableList 
+ja selle listi pannakse andmed tavalisest listist (meetodiga *addAll(Collection)*). Siin tulebki meile kasuks see, et tegime andmete 
+klassi meetodid staatilisteks - ei pea kogu aeg uut objekti looma, kui soovime saada värskendatud andmed kätte.
+
+**Näide veeru tagastavast meetodist**
+
+
+private static TableColumn cardTypeColumn() {
+        TableColumn<Card, String> cardTypeColumn = new TableColumn<>("Card type");
+        cardTypeColumn.setMinWidth(100);
+        cardTypeColumn.setCellValueFactory(new PropertyValueFactory<>("cardType"));
+        return cardTypeColumn;
+    }
+
+- Luuakse uus veerg
+- Veerule antakse laius
+- Veerule rakendatakse meetod, mis paneb selle veeru iga pesu sisse sama tüüpi ja kuju andmed ning jooksvalt värskendab neid
+- Selle meetodi parameetriks on *PropertyValueFactory<>(String valueType)*, mis määrabki, millist tüüpi andmed pannakse täpselt selle veergu
+
+Nende veergude korral, mis peavad kasutaja poolt "editable" olema, lisatakse loogikasse järgmised:
+
+- *setCellFactory(TextFieldTableCell.forTableColumn())*
+...täielikul JavaFX poolt valmis tehtud meetod pesa muutmiseks, ning
+
+- *setOnEditCommit(EventHandler<> e)*
+...mille abil kirjeldame, kuidas veeru pesad käituvad ennast, kui kasutaja hakkab selle sees olevaid andmeid muutma:
+
+column.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Card, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Card, String> t) {
+                (t.getTableView().getItems().get(t.getTablePosition().getRow())).setOwnerName(t.getNewValue());
+            }
+        });
+
+**NewCardForm** klass kujundab akent, mis ilmub juhul, kui soovitakse lisada uut pangakaarti ja vajutatakse main-screen-i peal olevat
+nuppu. Kõige peamises *display()* meetodis teeme selle layout-i komponendind korda - TextBox-id, Label-id, nupud jne.
+
+**NB!** Kaardi tüübi valimiseks on soovitav kasutada RadioButton nuppe. Nad laiendavad Button klassi ja seetõttu nende abil tegevuse
+teostamiseks kasutatakse sama *setOnAction()* meetodit. 
+
+Lisame veel kaks meetodit - näiteks:
+
+- *chooseCardType()* [kaardi tüüpi valimine nupuga ja vastavalt valikule edasi programmi suunamine]
+- *submitData()* [uute andmete lisamine tabelisse, tabeli värskendamine ja akna automaatne kinnipanek]
+
+**Boonus**
+Boonusosas oli vaja realiseerida sellist funktsionaalsust, et kaardi limiidi veerus saab muuta pesa sisu vaid juhul, kui see kaart 
+on krediidi kaart. Pesa sisu muutmise võimalise eest vastutab veerule rakendatud meetod *setCellFactory()*. Selle parameetri 
+väärtuseks  nüüd tuleb panna meie poolt ise tehtud objekt, mis määrab pesa sisu muutmist ja viisi, kuidas tuleb seda teha. Meie 
+juhul on vaja, et kaardi limiidi veeru pesad oleksid "editable" alles siis, kui selles reas on info krediidi kaardi kohta. Selleks 
+kirjeldame *startEdit()* meetodis, et pesa hakatakse muutma ainult juhul, kui selle rea kaardi tüüp on credit.
+
+public class CreditCardEditable extends TextFieldTableCell<Card, String> {
+
+    CreditCardEditable() {
+        super(new DefaultStringConverter());
+    }
+
+    @Override
+    
+    public void startEdit() {
+        TableRow<Card> row = getTableRow();
+        
+        Card card = row.getItem();
+        
+        if (card.isCreditCard()) {
+            super.startEdit();
+        }
+
+    }
+}
+
