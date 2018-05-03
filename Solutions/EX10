@@ -1,0 +1,158 @@
+EX10Stargate lahendusjuhend
+===========================================================
+(ehk kuidas ehitada planeete ja siis mõttetumad ära visata)
+-----------------------------------------------------------
+EX10Stargate'i lahendamisel tuleb kindlalt kasuks
+PR10-e läbitegu, kuid siin las olla vaid EX10Stargate'i
+ülesande juhend. Kui mõni samm tundub liiga lihtne, siis
+võib selle julgelt ise ära teha. Siit aga leiab ühe suuremat
+sorti rõõmusõnumi ehk evangeeliumi: päris kindlasti leiavad
+juhendist kõik väga põhjaliku ülevaate lahendusest ja algajad palju 
+abi, sest küsija suu pihta ei lööda: kui paned Githubis 
+issue külge, täiendatakse loodetavasti juhendit vastavalt.
+Hõissa ja laulupidu!
+
+Mooduli ja pakkide ülesseadmine ehk korista enne segaduse teket
+---------------------------------------------------------------
+Selleks, et ülesannet alustada, klõpsame parema hiireklahviga
+mõne mooduli peale, tekkinud valikmenüüs valime New->Module,
+vaatame tekkinud aknas, et me looks Java mooduli, mis kasutab 
+mõnda juba paigaldatud Java JDK-d. Vajutame Next ja muudame
+kausta nimeks EX10Stargate ja vajutame Finish. IntelliJ koostab
+ise projekti uue mooduli ja paneb sinna allikkausta src meile
+kasutamiseks. Milline rõõm!
+
+Edasi tuleb luua pakk ee.ttu.iti0202.stargate klõpsates 
+src kausta peal parema hiireklahviga ja valides valikmenüüs 
+New->Package. Sisesta ee.ttu.iti0202 paki nimeks ja loo 
+samamoodi pakile kaks alampakki: planet ja space, seekord
+ee.ttu.iti0202.stargate paki peal klõpsates. Siia lähevad
+meie ülesande klassid. Nüüd on meil kõik olemas, et hakata
+klasse lisama. Juhhei!
+
+Klass Planet ehk teeme kodus ise oma planeedi, tuleb odavam
+-----------------------------------------------------------
+Klass Planet hoiab endas järgmist infot: planeedi nime (sõne), 
+elanikearvu (long ehk ülipikk täisarv), kas planeedil on 
+tähevärav (tõeväärtus), kas too tähevärav on kasutatav
+või lihtsalt vanaraud (ehk kas DHD on olemas - veel üks 
+tõeväärtus) ja mis tiimid teda külastanud on (järjend sõnedest).
+Tegu on ülestuunitud järjendiga: selle asemel, et hoida ühe 
+planeedi andmeid lihtsas listis, paneme nad meie loodud klassi, 
+millel on rohkem võimalusi, šarmi ja isikupära. On mugavam 
+käidelda andmeid, kui IntelliJ pakub muutujanimesid puuvilja-
+vaagnal, kui et peab meeles hoidma, mis indeksiga on mingi
+kirje järjendis. Kuis metsa hõikad, nõnna vastu kajab!
+
+Selle jaoks paremklõpsame pakil planet ja valime New->Java class.
+Nimeks paneme Planet ja juba saame Planet klassi sisse 
+kirjutada viis muutujat:
+    private String name;
+    private long inhabitants;
+    private boolean stargateAvailable;
+    private boolean dhdAvailable;
+    private List<String> teamsVisited;
+Nüüd toimime järgnevalt: paremklõpsame koodiredaktori aknal 
+kuskil klassi sees ja valime Generate või olles kursoriga klassis
+vajutame Alt+Insert. Uues menüüs valime Getter and Setter ja tekkinud 
+aknas valime kõik muutujad vajutades Shift ja nooleklahve. 
+Klikkame OK ja tekivad ülesandes vajaminevad getter ja setter
+meetodid. Kuid see pole veel kõik! Samamoodi klõpsates ja 
+valides Generate ja Constructor, saame valida tekkinud aknas
+kõik muutujad, vajutada OK ja äkitsi on meil konstruktor, 
+mis klassis samuti vajalik oli. Nüüd on vaja vaid kirjutada nendele funktsioonide
+alla string, valida IntelliJ pakutud public toString() 
+funktsioon, panna funktsioon planeedi nime tagastama ja 
+klass on tehtud. Halleluuja! Kristus sündinud meil!
+
+Klass PlanetBuilder, sest allhanked on kasvava majanduse alus
+--------------------------------------------------------------
+Kui ütled PlanetBuilder, siis mõtled StringBuilder aga 
+planeetidega! Hetkekski ei tohiks olla kõhklust, mida PlanetBuilder
+teeb -- ta ehitab planeete! Aga milleks meil siis Planet klassi
+konstruktor? Teeb ta ju sama hästi planeedi valmis? Vastus on, 
+et kuigi IntelliJ ütleb mõnikord ette, mis parameetrid tuleb 
+klassis algväärtustada, siis ausalt öeldes on see mõnikord tüütu
+ja kaka-pähh. Ja mida teha siis, kui tahad andmeid lisada omas
+tempos, siis kui *sulle* sobib? Niisiis loome klassi, mis aitab 
+meil sutsu kergemalt hingata ja selgesti nimetatud funktsioonidega 
+lisada andmeid ja mis tagastab meile planeedi objekti siis, kui 
+*meie* seda soovime. Emantsipatsioon võidule!
+
+Paremklõpsatus koodil (aga mitte näiteks String märksõnal, proovi parem
+mõnd tühja rida selleks) ja valik Refactor->Replace Constructor with 
+Builder toob meie ette akna, mis täidab kõik me unistused. 
+Tekkinud aknas võtame veerus Setter Name kõikidelt muutujanimedelt
+set eest ära ja teeme algustähe väiketäheks, sest ülesanne nõuab nii
+ja vajutame Refactor. Tekib uus klass PlanetBuilder, mille objekti
+saame luua, anda funktsioonidega sisse erinevaid väärtusi ja luua
+Planet objekt funktsiooniga createPlanet(). Nõnnasi saame mängida 
+jumalat ja luua planeete oma elutoadiivanilt.
+
+Klass Space ehk ülekosmoseline Rajaleidja sõnarohkete funktsioonidega
+------------------------------------------------------------------------------
+Kosmos on suur kant ja tal on palju planeete, algaja võibolla ei teagi, millisele minna.
+Selleks on vaja neid sortida ja ülesande kirjelduses on kriteeriumid selgelt kirjas. 
+Järgnevalt on loetelu neist kõigist, võime nendest silmad üle libistada, sest võtame nad hiljem
+niikuinii üksipulgi lahti. 
+
+Selleks, et orienteeruda suures komsoses on meil vaja 7 
+funktsiooni: üht, mis tagastab järjendi klassile teada-tuntud planeetidest,
+teist, mis saab CSV (Comma separated values) vormis failst kätte plnaaetide andmed, 
+kolmandat, mis tagastab hulga planeetidest, kus pole elanikke, neljandat,mis annab hulga
+planeete, mida saab külastada, aga pole veel külastatud, viiendat, mis tagastab keskmise
+täheväravaga planeedi elanike arvu, kuuendat, mis tagastab tiimid, kes on külastanud vähe-
+asustatuid planeete, ja seitsmendat, mis tagastab planeetide tüübi koos nende sagedustega.
+Kuna tööd on parajalt, siis hakkame aga pihta. Tahad latva ronida, hakka tüvest peale!
+
+List<Planet> getPlanets() ehk kui peaksid tahtma kõiki planeete uurida ja külastada
+-----------------------------------------------------------------------------------
+
+On ilmselge, et planeetide tagastamiseks järjendina võiks luua instantsimuutuja, mis 
+kätkeb endas planeetide järjendit. Niisiis loome ja algväärtustame selle tühjaks järjendiks,
+et ei tekiks määramata väärtuse erindit:
+      private List<Planet> planets = new ArrayList<>();
+Nüüd pole miskit, kui seada üles getter meetod nii, nagu seda teinud juba oleme. Kes tasa
+sõuab, see kaugele jõuab.
+
+List<Planet> csvDataToPlanets(String filePath) ehk teiste töö ärakasutamine autorile viitamata
+----------------------------------------------------------------------------------------------
+Selleks, et saaksime andmeid töödelda ja esitada, peame tundmatu autori CSV-formaadis andmed vormima ümber 
+Planet objektideks, esitama neid enda tehtu pähe, salvestama nad ja paluma jumalat, et nood andmed on 
+usaldusväärsed ja vigadeta. Niisiis peame tegema vähe failist lugemist ja planeediloomet. Lisaks hakkame 
+esimest korda kogu ülesande jooksul kasutama Stream API-t, niisiis en guarde, noor koodija!
+
+Kõigepealt aga loeme failist kõik andmed ja paneme need muutujasse: selleks kasutame 
+Files.readAllLines(Path path) funktsiooni, mis mugavalt tagastab järjendi faili ridadest, millele path 
+parameeter viitab. Selleks aga, et parameeter filePath järsku Pathiks muutuks, kasutame järgmist koodirida,
+mille leidsime Java dokumentatsioonist:
+        Path path = Paths.get(filePath);
+Edasi valime ühe muutujanime, millesse salvestame kõik andmeread, näiteks lines. Nota bene! Faili näidisest järeldame, et esimene
+rida sisaldab alati veeru päised, ehk siis metaandmeid, mis meile on silmaga kontrollimisel küll tulusad, 
+aga mida töödelda on asjatu. Niisiis jätame välja tolle esimese rea:
+        List<String> lines = Files.readAllLines(path).sublist(1, lines.size());
+IntelliJ Java kompilaator aga pistab röökima selle peale, sest, nagu kõik head programmid, ta usaldab vähe kasutaja hooleks,
+veel vähem usaldab kasutajat. Sellel real võib tekkida sisend-väljund erind (InputOutputError), mis võib 
+tulla sellest, et pole faili või faili ei saa avada (pole õigusi) või fail on kuskil mujal või universum 
+tahab sulle öelda, et sa võiksid lahendada teised meetodid kõigepealt ära ja minna selle konkreetse reaga 
+Ago juurde konsulli. Kuna aga Java tahab kindlalt koodiga edasi minna, olgu mis tahes, siis, olles kursoriga 
+tol real, vajuta Alt-Enter ja vali Surround with try-catch. IntelliJ genereerib koodi, mis Java kompilatori 
+maha rahustab, ja kõik on jälle korras. Kas pole mitte tore?
+
+Nüüd on aeg kasutada Java vooge (Stream API-t). Teeme ridade järjendist voo, paneme voole vahemeetodi map(), kus
+lisame hiljem andmed omatehtud andmestruktuuridesse ja kogume voo lõpus lisamisel tagastatu järjendisse, salvestades 
+kogutu intsantsimuutujasse, mille tegime eelmist funktsiooni tehes:
+        planets = lines.stream()
+                        .map(
+                        // Meetod, mis töötleb ühe rea andmeid, teeb neist PlanetBuilderiga ühe Planeti
+                        )
+                        .collect(Collectors.toList());
+Meenutame, et .stream() tegi andmestruktuurist tema elementide voo, .map() töötleb igat voo elementi vastavalt 
+argumendiks antud funktsioonile ja .collect() kasutab argumendiks antud meetodit, mis kogub elemendid kokku uueks
+andmestruktuuriks.
+
+Edasi peame kirjutama igat rida töötleva koodi. Kasutame selleks lambdat ja PlanetBuilderit.
+
+# varsti kirjutan edasi
+
+
