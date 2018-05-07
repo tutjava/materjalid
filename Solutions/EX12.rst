@@ -21,11 +21,11 @@ Selleks, et igal kaubal oleks riskitase, kasutan annan igale enumi väärtusele 
   .. code:: java
 
     public Cargo(CargoType cargoType) {
-        this.name = cargoType;
+        this.cargoType = cargoType;
     }
 
     public int getDangerLevel() {
-        return name.dangerLevel;
+        return cargoType.dangerLevel;
     }
 
 Class Car
@@ -64,9 +64,9 @@ palju.
   .. code:: java
 
     private boolean cargosAreOk() {
-      return cargos.size() == 0 || cargos.size() == 1 || cargos.contains("FUEL")
-              && cargos.contains("WOOD") || cargos.contains("WATER") && cargos.contains("HUMAN")
-              || cargos.contains("WOOD") && cargos.contains("HUMAN");
+      return cargos.size() == 0 || cargos.size() == 1 || cargos.contains(Cargo.CargoType.FUEL)
+              && cargos.contains(Cargo.CargoType.FIRE) || cargos.contains(Cargo.CargoType.WATER) && cargos.contains(Cargo.CargoType.HUMAN)
+              || cargos.contains(Cargo.CargoType.WOOD) && cargos.contains(Cargo.CargoType.HUMAN);
     }
     
 Kui kontroll on tehtud, siis oleks vaadata ka seda, et riskitase ei läheks liiga suureks. Võiks teha listi, kuhu pannakse kõik vagunid,
@@ -94,10 +94,6 @@ Siis peaks tegema valuku veduri suhtes. (Mõistlik teha eraldi meetodis) PS. Sii
       if (engineList.size() > 0) {
           if (cargoTypes.length == 1 && cargoTypes[0].getDangerLevel() > this.getBestEngine().get()
                   .getRiskLevel()) {
-              try {
-                  throw new TooRiskyCargo("Too risky");
-              } catch (TooRiskyCargo a) {
-                  System.out.println("Too risky cargo");
                   return Optional.empty();
               }
           }
