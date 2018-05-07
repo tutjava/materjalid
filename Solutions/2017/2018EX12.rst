@@ -6,26 +6,26 @@ Selleks, et mitte luua iga kauba tüübi jaoks eraldi klassi, loome enum`i.
 
   .. code:: java
 
-    private enum CargoType {
-        HUMAN, WOOD, WATER, FUEL, FIRE
+    public enum CargoType {
+        HUMAN(1), WOOD(2), WATER(3), FUEL(4), FIRE(5);
+
+        int dangerLevel;
+
+        CargoType(int value) {
+            this.dangerLevel = value;
+        }
+        
     }
-Selleks, et igal kaubal oleks riskitase, kasutan muutujat konsturktori sees ning lähen tsükliga mööda CargoType. Võimalus oleks ka üleval
-kuskul teha Map`i, kus key=cargotype ning value=dangerlevel.
+Selleks, et igal kaubal oleks riskitase, kasutan annan igale enumi väärtusele kaasa numbri, mis tähendab riskitaset.
+
   .. code:: java
 
     public Cargo(CargoType cargoType) {
-        int count = 0;
-        for (CargoType cargo: Cargo.CargoType.values()) {
-            count++;
-            if (cargo == cargoType) {
-                dangerLevel = count;
-                break;
-            }
-        }
-        if (count > 3) {
-            count++;
-        }
-        dangerLevel = count;
+        this.name = cargoType;
+    }
+
+    public int getDangerLevel() {
+        return name.dangerLevel;
     }
 
 Class Car
