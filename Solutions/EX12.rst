@@ -7,7 +7,7 @@ Selleks, et mitte luua iga kauba tüübi jaoks eraldi klassi, loome enum`i.
   .. code:: java
 
     public enum CargoType {
-        HUMAN(1), WOOD(2), WATER(3), FUEL(4), FIRE(5);
+        HUMAN(1), WOOD(2), WATER(4), FUEL(5), FIRE(6);
 
         int dangerLevel;
 
