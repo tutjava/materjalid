@@ -151,8 +151,143 @@ Meenutame, et .stream() tegi andmestruktuurist tema elementide voo, .map() töö
 argumendiks antud funktsioonile ja .collect() kasutab argumendiks antud meetodit, mis kogub elemendid kokku uueks
 andmestruktuuriks.
 
-Edasi peame kirjutama igat rida töötleva koodi. Kasutame selleks lambdat ja PlanetBuilderit.
+Edasi peame kirjutama igat rida töötleva koodi. Kasutame selleks lambdat ja PlanetBuilderit. Alustame lambdaga:
+    
+    line -> { // töötlev kood}
+    
+Seal sees peame rea jaotama sõnemassiiviks split() meetodiga, kasutame poolitajana koma, käivitame
+uue PlanetBuilderi klassi, paneme nimeks nullinda elemendi sõnemassiivist (sest esimene
+veerg hoiab endas planeedinime), elanike arvuks esimese, tähevärava olemasoluks teise, ja
+DHD olemasoluks kolmanda. Neljanda väljaga, milleks on külastanud tiimide nimed, tuleb
+rohkem tööd teha, seal peab vaatama, et ta oleks rohkem kui 2 tähemärki pikk (ehk siis
+ei ole lihtsalt tühjad nurksulud), jaotama ta sõnemassiiviks split() funktsiooniga, kuid
+seejuures ei tohi kaasa võtta esimest tähemärki ja viimast, sest nad on nurksulud ja
+järjendi tähiseks, mitte ühegi planeedi nime osa. Viimaks, kui oleme lisanud kõik väljad,
+loome planeedi ja tagastame selle lambdas. Seega oleks kogu töötlev kood selline:
+    line -> {
+                String[] lineData = line.split(",");
+                PlanetBuilder planetBuilder = new PlanetBuilder();
+                planetBuilder.name(lineData[0]);
+                planetBuilder.inhabitants(Long.parseLong(lineData[1]));
+                planetBuilder.stargateAvailable(Boolean.parseBoolean(lineData[2]));
+                planetBuilder.dhdAvailable(Boolean.parseBoolean(lineData[3]));
 
-# varsti kirjutan edasi
+                String teamsVisited = lineData[4];
+                if (teamsVisited.length() > 2) {
+                    planetBuilder.teamsVisited(Arrays.asList(teamsVisited.substring(1, teamsVisited.length() - 1)
+                            .split("; ")));
+                } else {
+                    planetBuilder.teamsVisited(new ArrayList<>());
+                }
+
+                Planet planet = planetBuilder.createPlanet();
+                planets.add(planet);
+                return planet;
+                }
+
+Viimaks tagastame csvDataToPlanets() funktsioonis planeedid, mida kogusime:
+
+return planets;
+
+getDeadPlanets(List<Planet> planets) ehk potentsiaalsed klassiekskursiooniideed
+-------------------------------------------------------------------------------
+
+Siin hakkame kasutama Stream API-d. Kõigepealt loome planeetidest voo:
+
+    planets.stream()
+
+Filtrime välja need planeedid, kus pole elanikke, aga kuhu saab reisida:
+    
+    planets.stream()
+                .filter(planet -> planet.getTeamsVisited().size() == 0
+                        && planet.isDhdAvailable() && planet.isStargateAvailable())
+                        
+Ja kogume nad kokku hulgaks ja tagastame ta:
+
+        return planets.stream()
+                .filter(planet -> planet.getTeamsVisited().size() == 0
+                        && planet.isDhdAvailable() && planet.isStargateAvailable())
+                .collect(Collectors.toSet());
+
+
+getAvgInhabitantsOnPlanetsWithStargate(List<Planet> planets) ehk statistiku maiuspala
+-------------------------------------------------------------------------------------
+
+Siin me peame samamoodi sõela peale saama planeedid, kuhu on võimalik reisida, ja võtma 
+nende elanike arvu ja tagastama kõigi planeetide keskmise elanike arvu. Võtmiseks sobib
+mapToLong() funktsioon, millel on lambda-funktsioon sees, mis tagastab planeedi elanike
+arvu, ja keskmise leidmiseks sobib .average() funktsioon. Nii tuleb funktsiooni sisuks:
+
+return planets.stream().filter(planet -> planet.isStargateAvailable())
+                .mapToLong(planet -> planet.getInhabitants()).average();
+
+
+getTeamsWhoHaveVisitedSmallNotDeadPlanets(List<Planet> planets) ehk keda tunnustada äärealase tegevuse eest
+-----------------------------------------------------------------------------------------------------------
+
+Siin alustame samuti sõelumisega: tahame sõela peale saada planeedid, mille elanike arv
+on väiksem kui 2500, aga suurem kui 0. Peale seda peame tiimide järjendite voo muutma 
+tiimide vooks. Niisiis näeb meie koodirida välja nüüd selline:
+
+    planets.stream().filter(n -> n.getInhabitants() < inhabitantLimit && n.getInhabitants() > 0)
+                .flatMap(n -> n.getTeamsVisited().stream())
+
+Siia lisandub see nõue, et me peame kordustest lahti saama, selleks sobib .distinct():
+
+    planets.stream().filter(n -> n.getInhabitants() < inhabitantLimit && n.getInhabitants() > 0)
+                    .flatMap(n -> n.getTeamsVisited().stream())
+                    .distinct()
+          
+Ülesandes on vaja too tiimide voog ära sortida, niisiis peame kasutama .sorted() funktsiooni.
+Samas me ei saa puhtalt terve tiimi nime põhjal sortimist teha, peame kasutama numbrilist osa.
+Selleks peame tegema võrdleja, ehk siis meetodi, mis tagastab positiivne täisarvu, kui 
+esimene objekt on teisest suurem, nulli, kui objektid on võrdsed, või negatiivse täisarvu,
+kui teine on esimesest suurem. Lisandub kood:
+
+                    .sorted((o1, o2) -> {
+                                        int first = Integer.parseInt(o1.substring(3, o1.length()));
+                                        int second = Integer.parseInt(o2.substring(3, o2.length()));
+                                        if (first > second) {
+                                            return 1;
+                                        } else if (first < second) {
+                                            return -1;
+                                        } else {
+                                            return 0;
+                                        }
+                                    })
+                                    
+Nüüd kogume tulemused kokku ja tagastame need:
+
+    return planets.stream()
+        ...
+        .collect(Collectors.toList());
+
+
+getCodeNameClassifierFrequency(List<Planet> planets) ehk vaatame planeetide seisu
+---------------------------------------------------------------------------------
+
+Siin peame planeetide voost sõeluma välja need, mis ei vasta ülesandes kirjeldatud mustrile.
+Üks viis seda teha on poolitada planeedi nimi tolle mustri järgi ja vaadata, kas tekkinud 
+sõnemassiiv on võrdne tühja sõnemassiiviga. Viimaseks sobib staatiline meetod Arrays.equals(),
+esimeseks on tarvis sutsu regulaaravaldisi tunda: kui meil on esimene täht P, millele
+järgneb kaks numbrit või tähte, millele järgneb sidekriips ja numbririda, siis sel puhul
+tuleb järgnev kood kasuks:
+
+     .filter(n -> Arrays.equals(
+                            n.getName().split("P\\p{Alnum}\\p{Alnum}-\\p{Digit}*"), new String[]{}))
+                        
+Sealt edasi peame ta koguma Mapiks, niisiis peame kasutama üht erilist kollektorit: 
+Collector.groupingBy(). Meie juhul anname talle kaks argumenti: esiteks funktsiooni,
+mis tagastab võtme, millega ta Mapis toimtama hakkab, ja funktsiooni, mis täpsustab, 
+mida väärtusega teha. Esimeseks sobib lambda, mis tagastab planeedi identifikaatori,
+teiseks sobib Collector.summingLong() funktsioon, mille sees on funktsioon, mis tagastab ühe.
+
+.collect(Collectors.groupingBy(planet -> planet.getName().substring(0, 3),
+                        Collectors.summingLong(e -> 1)));
+
+ 
+ Sellega on ülesanne lahendatud ja saab minna konsultatsiooni kaitsma!
+
+    
 
 
