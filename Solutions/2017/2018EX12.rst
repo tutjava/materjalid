@@ -1,0 +1,138 @@
+EX12
+====
+Class Cargo
+
+Selleks, et mitte luua iga kauba tüübi jaoks eraldi klassi, loome enum`i.
+
+  .. code:: java
+
+    public enum CargoType {
+        HUMAN(1), WOOD(2), WATER(3), FUEL(4), FIRE(5);
+
+        int dangerLevel;
+
+        CargoType(int value) {
+            this.dangerLevel = value;
+        }
+        
+    }
+Selleks, et igal kaubal oleks riskitase, kasutan annan igale enumi väärtusele kaasa numbri, mis tähendab riskitaset.
+
+  .. code:: java
+
+    public Cargo(CargoType cargoType) {
+        this.name = cargoType;
+    }
+
+    public int getDangerLevel() {
+        return name.dangerLevel;
+    }
+
+Class Car
+
+Siin klassis võiks olla muutuja, mis hoiab enda sees klassi Cargo objekti (või mitte hoiab, juhul kui car on tühi). Kuna car võib tühi olla,
+siis peab olema võimalus seda täita kaubaga. Näiteks iga Cargo objekti sees võib olla muutuja, kuhu pannakse sisse kaup.
+
+  .. code:: java
+
+    public String getCargoName() {
+      if (cargo == null) {
+        return "EMPTY";
+      } else {
+        return cargo.getName();
+      }
+    }
+    
+Class Engine
+
+Kuna veduriga peab andma kaasa tema riskitaset, siis peaks juba konstruktoris määrama, et veduri loomisel seda kindlasti annakse kaasa.
+Sellele võiks järgneda kontroll selleks, et keegi kogemata ei paneks riskitaseme väärtuseks negatiivse arvu või nulli.
+
+  .. code:: java
+
+    if (riskLevel <= 0) {
+        risklevel = 1;
+    }
+    
+Class Train
+
+Kuna rongil on vedur ja vagunid, siis rongi loomisel peaks andma talle veduri ja vaguneid.
+On vaja meeles pidada, et mõned kaubad ei sobi koos vedamiseks, seega on vaja teha kontroll. Näiteks, lisada kõik potentsiaalsed kaubad
+listi ja siis kirjutada abimeetod. Kui lugeda hoolikalt läbi kaupade mittesobivused, siis osutub, et õigeid kombinatsioone pole väga
+palju.
+
+  .. code:: java
+
+    private boolean cargosAreOk() {
+      return cargos.size() == 0 || cargos.size() == 1 || cargos.contains("FUEL")
+              && cargos.contains("WOOD") || cargos.contains("WATER") && cargos.contains("HUMAN")
+              || cargos.contains("WOOD") && cargos.contains("HUMAN");
+    }
+    
+Kui kontroll on tehtud, siis oleks vaadata ka seda, et riskitase ei läheks liiga suureks. Võiks teha listi, kuhu pannakse kõik vagunid,
+mille summaarne riskitase oleks väiksem kui vedur võimaldab.
+  .. code:: java
+
+    int sum = 0;
+    for (Car car: a) {
+        if (sum + car.getCargo().getDangerLevel() <= engine.getRiskLevel()) {
+            trainCars.add(car);
+            sum += car.getCargo().getDangerLevel();
+        } 
+    }
+    
+Class Depot
+
+Võiks olla list kus hoitakse selle depoo vagunid ning ka selle depoo vedurid. Peab olema võimalus lisada ja eemaldada listidest elementid
+(kuna depoosse võib olmuda uus rong või siis vedur). Peamiseks meetodiks depoo klassis on rongi tegemine. Rongide mäletamiseks pärast 
+rongi tegemist võiks seda lisada listi. Algul peaks tegema kaupade kontrolli (vaata meetodit üleval). 
+
+Siis peaks tegema valuku veduri suhtes. (Mõistlik teha eraldi meetodis) PS. Siin valitakse parimat vedurit (boonus)
+
+    .. code:: java
+
+      if (engineList.size() > 0) {
+          if (cargoTypes.length == 1 && cargoTypes[0].getDangerLevel() > this.getBestEngine().get()
+                  .getRiskLevel()) {
+              try {
+                  throw new TooRiskyCargo("Too risky");
+              } catch (TooRiskyCargo a) {
+                  System.out.println("Too risky cargo");
+                  return Optional.empty();
+              }
+          }
+          int index = 0;
+          for (int i = 0; i < engineList.size(); i++) {
+              if (engineList.get(i).getRiskLevel() > engineList.get(index).getRiskLevel()) {
+                  index = i;
+              }
+          }
+          Engine head = engineList.get(index);
+          engineList.remove(index);
+          
+Nüüd peab panema kaubad vagunitesse ja teha rongi. Alljärgnevas koodis on vaadatud juhtum kus esimeseks vaguniks ei tohi olla fuel 
+(tehakse Boonust). Vaadake kindlasti üle ka teised juhtumid (kui rongi ei tagastata) ja tagastake tühka Optional`i. Tulemus salvastatakse
+rongide listis.
+
+  .. code:: java
+
+    if (riskLevel <= 0) {
+        risklevel = 1;
+    }
+    if (chosenCarsss.size() > 0) {
+      if (chosenCarsss.get(0).getCargoName().equals("FUEL")) {
+        return Optional.empty();
+      }
+    Train trainNew = new Train(head, chosenCarsss.toArray(new Car[chosenCarsss.size()]));
+    trainList.add(trainNew);
+    return Optional.of(trainNew);
+    }
+
+Boonus
+
+Selles osas on vaja kasutada erindite püüdmist ning ka teha erindeid. Soovitan lugeda sellest siin: 
+https://ained.ttu.ee/javadoc/Exceptions.html#erindiga-tegelemine-exception-handling
+Lisaks sellele on vaja kirjutada testid. Testide kirjutamise kohta saab teada siin (lõpus):
+https://ained.ttu.ee/mod/charon/view.php?id=6045
+
+Kontroll selleks, et kütus poleks esimeseks kaubaks on realiseeritud ning veduriks valitakse ka parima riskitasemega vedur.
